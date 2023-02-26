@@ -1,28 +1,23 @@
 import pandas as pd
-from pip._vendor import requests
+import requests
 
+params = {"offset": 1, "limit": 100}
+results = []
 
-header = {
-    "access_token": 'fe66583bfe5185048c66571293e0d358'
-}
-params = {
-    "limit": 100,
-    "offset": 1
-    }
-
-# empty list to store records
-result = [] 
-
-# loop to fetch 500 records
-while params.get("offset") < 500:
-    response = requests.get(f"https://globalmart-api.onrender.com/mentorskool/v1/sales", headers=header, params=params).json()
-
-    result += response["dara"]
+# Make an HTTP GET request to the API and parse the response as JSON
+while params.get("offset") <= 500:
+    response = requests.get(
+        "https://globalmart-api.onrender.com/mentorskool/v1/sales",
+        headers={"access_token": "fe66583bfe5185048c66571293e0d358"},
+        params=params,
+    ).json()
+    results += response["data"]
     params["offset"] = int(response.get("next").split("=")[1][:3])
 
-# Normalize json data into dataframe
-df = pd.json_normalize(result)
+# Normalize the JSON data into a DataFrame
+df = pd.json_normalize(results)
 
+# Print the column labels
 print(df.columns)
 
 resultDataFrame = df[
@@ -42,9 +37,9 @@ resultDataFrame = df[
         "product.category",
         "order.customer.customer_id",
         "order.customer.customer_name",
-        "order.vendor.vendor_id"
+        "order.vendor.VendorID",
     ]
 ]
 
-# saving dataframe to a csv file
-resultDataFrame.to_csv("task_4.csv", index=False)
+# Save the DataFrame to a CSV file
+resultDataFrame.to_csv("Task1.csv", index=False)
